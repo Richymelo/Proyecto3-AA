@@ -1,0 +1,79 @@
+#include <stdio.h>
+
+#define MAX 20  // Tamaño máximo para subconjuntos
+
+// Variables globales para estadísticas
+int soluciones = 0;
+int nodos = 0;
+
+// Función para imprimir un subconjunto y su suma
+void imprimirSubconjunto(int* conjunto, int tam, int suma) {
+    printf("[");
+    for (int i = 0; i < tam; i++) {
+        printf("%d", conjunto[i]);
+        if (i < tam - 1) printf(", ");
+    }
+    printf("] Suma: %d\n", suma);
+}
+
+// ========================
+// VARIANTE 3: Mayor o Igual
+// ========================
+void sumaSubconjuntosV3(int* A, int n, int W, int index, int* actual, int tam_actual, int suma_actual) {
+    nodos++;
+
+    if (suma_actual >= W) {
+        soluciones++;
+        imprimirSubconjunto(actual, tam_actual, suma_actual);
+        // No retornamos: seguimos buscando subconjuntos más grandes
+    }
+
+    for (int i = index; i < n; i++) {
+        actual[tam_actual] = A[i];
+        sumaSubconjuntosV3(A, n, W, i + 1, actual, tam_actual + 1, suma_actual + A[i]);
+    }
+}
+
+// ====================================
+// VARIANTE 4: Mayor o Igual Acotado
+// ====================================
+void sumaSubconjuntosV4(int* A, int n, int W, int index, int* actual, int tam_actual, int suma_actual) {
+    nodos++;
+
+    if (suma_actual >= W) {
+        soluciones++;
+        imprimirSubconjunto(actual, tam_actual, suma_actual);
+        return;  // Ya no agregamos más elementos: solución mínima encontrada
+    }
+
+    for (int i = index; i < n; i++) {
+        actual[tam_actual] = A[i];
+        sumaSubconjuntosV4(A, n, W, i + 1, actual, tam_actual + 1, suma_actual + A[i]);
+    }
+}
+
+// ============================
+// FUNCIÓN DE PRUEBA EN CONSOLA
+// ============================
+int main() {
+    int A[] = {3, 1, 2, 5};  // Puedes modificar este conjunto para pruebas
+    int n = 4;
+    int W = 6;
+    int subconjunto[MAX];
+
+    printf("=== VARIANTE 3: Mayor o Igual ===\n");
+    soluciones = 0;
+    nodos = 0;
+    sumaSubconjuntosV3(A, n, W, 0, subconjunto, 0, 0);
+    printf("Total de soluciones: %d\n", soluciones);
+    printf("Nodos visitados: %d\n\n", nodos);
+
+    printf("=== VARIANTE 4: Mayor o Igual Acotado ===\n");
+    soluciones = 0;
+    nodos = 0;
+    sumaSubconjuntosV4(A, n, W, 0, subconjunto, 0, 0);
+    printf("Total de soluciones: %d\n", soluciones);
+    printf("Nodos visitados: %d\n", nodos);
+
+    return 0;
+}
