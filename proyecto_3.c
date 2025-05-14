@@ -14,7 +14,7 @@
 
 // Para que no se mueva la línea del panel
 void fijar_panel(GtkPaned *panel, GParamSpec *pspec, gpointer user_data) {
-    const int pos_fijada = 1000;    // Posición donde se fija la división
+    const int pos_fijada = 920;    // Posición donde se fija la división
     int current_pos = gtk_paned_get_position(panel);
     if (current_pos != pos_fijada) {
         gtk_paned_set_position(panel, pos_fijada);
@@ -114,26 +114,31 @@ static void on_size_value_changed(GtkSpinButton *spin, gpointer user_data) {
 }
 
 int main(int argc, char *argv[]) {
-    GtkBuilder      *builder;
-    GtkWidget       *ventana;
-    GtkWidget       *panel;
-    GtkSpinButton   *spin_size;
-    DeltaWidgets    *dw;
+    GtkBuilder *builder;
+    GtkWidget *ventana;
+    GtkWidget *panel;
+    GtkWidget *boton_salida;
+    GtkSpinButton *spin_size;
+    DeltaWidgets *dw;
 
     gtk_init(&argc, &argv);
 
-    // 1) Carga de la interfaz
+    // Cargar de la interfaz
     builder = gtk_builder_new_from_file("interfaz.glade");
 
-    // 2) Ventana principal
+    // Ventana principal
     ventana = GTK_WIDGET(gtk_builder_get_object(builder, "ventana"));
     g_signal_connect(ventana, "destroy", G_CALLBACK(gtk_main_quit), NULL);
 
-    // 3) Panel divisor (si lo usas para algo)
+    // Panel divisor (si lo usas para algo)
     panel = GTK_WIDGET(gtk_builder_get_object(builder, "division"));
     g_signal_connect(panel, "notify::position", G_CALLBACK(fijar_panel), NULL);
 
-    // 4) Reserva e inicializa tu struct con todos los widgets
+    // El bóton de terminación del programa
+    boton_salida = GTK_WIDGET(gtk_builder_get_object(builder, "buttonFinish"));
+    g_signal_connect(boton_salida, "clicked", G_CALLBACK(gtk_main_quit), NULL);
+
+    // Reserva e inicializa tu struct con todos los widgets
     dw = g_new0(DeltaWidgets, 1);
     dw->box_ai     = GTK_BOX(
         gtk_builder_get_object(builder, "box_ai"));
@@ -144,29 +149,24 @@ int main(int argc, char *argv[]) {
     dw->rb_delta   = GTK_TOGGLE_BUTTON(
         gtk_builder_get_object(builder, "varianteDelta"));
 
-    // 5) Conecta el radio ∆ (antes de poblar nada)
-    g_signal_connect(dw->rb_delta, "toggled",
-                     G_CALLBACK(on_delta_toggled),
-                     dw);
+    // Conecta el radio ∆ (antes de poblar nada)
+    g_signal_connect(dw->rb_delta, "toggled", G_CALLBACK(on_delta_toggled), dw);
 
-    // 6) Conecta el spin de tamaño, pasándole todo el struct
-    spin_size = GTK_SPIN_BUTTON(
-        gtk_builder_get_object(builder, "size"));
-    g_signal_connect(spin_size, "value-changed",
-                     G_CALLBACK(on_size_value_changed),
-                     dw);
+    // Conecta el spin de tamaño, pasándole todo el struct
+    spin_size = GTK_SPIN_BUTTON(gtk_builder_get_object(builder, "size"));
+    g_signal_connect(spin_size, "value-changed", G_CALLBACK(on_size_value_changed), dw);
 
-    // 7) Estado inicial de la UI: crear los ai
+    // Estado inicial de la UI: crear los ai
     on_size_value_changed(spin_size, dw);
 
-    // 8) Mostrar la ventana y pasar a fullscreen
+    // Mostrar la ventana y pasar a fullscreen
     gtk_widget_show_all(ventana);
     gtk_window_fullscreen(GTK_WINDOW(ventana));
     
-    // 9) Estado inicial de la UI: ocultar ∆
+    // Estado inicial de la UI: ocultar ∆
     on_delta_toggled(dw->rb_delta, dw);
 
-    // 10) Loop principal
+    // Loop principal
     gtk_main();
 
     g_object_unref(builder);
