@@ -2,6 +2,8 @@
     "files.associations": {
         "gtk.h": "c",
         "cairo.h": "c",
-        "stdbool.h": "c"
+        "stdbool.h": "c",
+        "variante 3 y 4": "cpp",
+        "glib.h": "c"
     }
 }
