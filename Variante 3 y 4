@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 
 #define MAX 20  // Tamaño máximo para subconjuntos
 
@@ -14,6 +15,87 @@ void imprimirSubconjunto(int* conjunto, int tam, int suma) {
         if (i < tam - 1) printf(", ");
     }
     printf("] Suma: %d\n", suma);
+}
+
+typedef struct {
+    int elementos[MAX];  // 0 o 1, indicando inclusión
+    int suma;            // suma total (debe ser igual a W)
+} Solucion;
+
+Solucion soluciones[MAX];
+int total_soluciones = 0;
+
+int W, n, delta,include[MAX], input[MAX];
+
+// ========================
+// VARIANTE 1: Basica
+// ========================
+
+void escribirSol() {
+    for (int i = 0; i < n; i++) {
+        soluciones[total_soluciones].elementos[i] = include[i];
+    }
+    soluciones[total_soluciones].suma = W;
+    total_soluciones++;
+}
+
+int promising(int i, int A, int pendiente) {
+    return (((A + pendiente) >= W) && ((A == W) || (A + input[i + 1] <= W)));
+}
+
+int sumaSub(int i, int A, int pendiente) {
+    if (promising(i, A, pendiente)) {
+        if (A == W) {
+            escribirSol();
+            return 0;
+        }
+        else {
+            //Incluye el siguiente elemento
+            include[i + 1] = 1;
+            sumaSub(i + 1, A + input[i + 1], pendiente - input[i + 1]);
+
+            //Excluye el siguiente elemento
+            include[i + 1] = 0;
+            sumaSub(i + 1, A, pendiente - input[i + 1]);
+        }
+    }
+}
+
+
+
+// ========================
+// VARIANTE 2: Delta
+// ========================
+void guardar_solucion() {
+    for (int i = 0; i < n; i++) {
+        soluciones[total_soluciones].elementos[i] = include[i];
+    }
+    soluciones[total_soluciones].suma = 0;
+    for (int i = 0; i < n; i++) {
+        if (include[i]) soluciones[total_soluciones].suma += input[i];
+    }
+    total_soluciones++;
+}
+
+int promising(int i, int A, int pendiente) {
+    return ((A + pendiente >= W - delta) && (A <= W + delta));
+}
+
+void sumaSubDelta(int i, int A, int pendiente) {
+    if (promising(i, A, pendiente)) {
+        if (A >= W - delta && A <= W + delta) {
+            guardar_solucion();
+        }
+        // Incluir el siguiente
+        if (i + 1 < n) {
+            include[i + 1] = 1;
+            sumaSubDelta(i + 1, A + input[i + 1], pendiente - input[i + 1]);
+
+            // No incluirlo
+            include[i + 1] = 0;
+            sumaSubDelta(i + 1, A, pendiente - input[i + 1]);
+        }
+    }
 }
 
 // ========================
