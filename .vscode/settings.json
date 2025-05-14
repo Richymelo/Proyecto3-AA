@@ -1,0 +1,7 @@
+{
+    "files.associations": {
+        "gtk.h": "c",
+        "cairo.h": "c",
+        "stdbool.h": "c"
+    }
+}
