@@ -9,6 +9,8 @@ typedef struct {
     GtkSpinButton *spin_w;
 
     /* radios de variantes */
+    GtkToggleButton *rb_v1;    // “Básica”
+    GtkToggleButton *rb_v2;    // “Delta”
     GtkToggleButton *rb_v3;    // “Mayor o Igual”
     GtkToggleButton *rb_v4;    // “Mayor o Igual Acotado”
 

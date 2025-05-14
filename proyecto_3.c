@@ -16,6 +16,7 @@
 
 int nodos = 0;
 int soluciones = 0;
+int delta = 0;
 
 // Para que no se mueva la línea del panel
 void fijar_panel(GtkPaned *panel, GParamSpec *pspec, gpointer user_data) {
@@ -172,10 +173,7 @@ on_execute_clicked(GtkButton *btn, gpointer data)
 
     // 2) Leer W y Δ
     int W = gtk_spin_button_get_value_as_int(w->spin_w);
-    int delta = gtk_toggle_button_get_active(
-                    GTK_TOGGLE_BUTTON(w->rb_delta))
-                ? gtk_spin_button_get_value_as_int(w->spin_delta)
-                : 0;
+    delta = gtk_spin_button_get_value_as_int(w->spin_delta);
 
     // 3) (Re)crear suffix_sum **global**
     if (suffix_sum) {
@@ -195,16 +193,31 @@ on_execute_clicked(GtkButton *btn, gpointer data)
     int actual_idx[12];
 
     // 5) Ejecutar backtracking
-    if (gtk_toggle_button_get_active(
-          GTK_TOGGLE_BUTTON(w->rb_v3)))
-    {
+    if(gtk_toggle_button_get_active(
+        GTK_TOGGLE_BUTTON(w->rb_v2))){
+        delta = gtk_spin_button_get_value_as_int(w->spin_delta);
+        sumaSubconjuntosV2_collect(
+            A, n, W, 0, actual_idx, 0, 0, sol_list);
+        //g_print("[DEBUG] Variante Δ escogida\n");
+
+    } else if (gtk_toggle_button_get_active(
+        GTK_TOGGLE_BUTTON(w->rb_v3))){
         sumaSubconjuntosV3_collect(
             A, n, W, 0, actual_idx, 0, 0, sol_list);
-    }
-    else
+        //g_print("[DEBUG] Variante MI escogida\n");
+
+    } else if (gtk_toggle_button_get_active(
+          GTK_TOGGLE_BUTTON(w->rb_v4)))
     {
         sumaSubconjuntosV4_collect(
             A, n, W, 0, actual_idx, 0, 0, sol_list);
+        //g_print("[DEBUG] Variante MI Acotada escogida\n");
+    }
+    else
+    {
+        sumaSubconjuntosV1_collect(
+            A, n, W, 0, actual_idx, 0, 0, sol_list);
+        //g_print("[DEBUG] Variante Basica escogida\n");
     }
 
     // 6) Actualizar labels
@@ -260,6 +273,27 @@ on_execute_clicked(GtkButton *btn, gpointer data)
 int main(int argc, char *argv[]) {
     gtk_init(&argc, &argv);
 
+    const gchar *scroll_css =
+    /* Aplica a cualquier widget con la clase “white-bg” */
+    ".white-bg {\n"
+    "  background-image: none;\n"
+    "  background-color: #FFFFFF;\n"
+    "}\n"
+    /* Hace los labels dentro de .white-bg en negro */
+    ".white-bg label {\n"
+    "  color: #000000;\n"
+    "}\n";
+
+    GtkCssProvider *scroll_provider = gtk_css_provider_new();
+    gtk_css_provider_load_from_data(
+        scroll_provider, scroll_css, -1, NULL);
+    gtk_style_context_add_provider_for_screen(
+        gdk_screen_get_default(),
+        GTK_STYLE_PROVIDER(scroll_provider),
+        GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
+    g_object_unref(scroll_provider);
+
+
     GtkBuilder *builder = gtk_builder_new_from_file("interfaz.glade");
     AppWidgets *w = g_new0(AppWidgets, 1);
 
@@ -283,8 +317,13 @@ int main(int argc, char *argv[]) {
         gtk_builder_get_object(builder, "spin_w"));
 
     // Radios de variantes
+    w->rb_v1       = GTK_TOGGLE_BUTTON(
+        gtk_builder_get_object(builder, "varianteBasic"));
+    w->rb_v2       = GTK_TOGGLE_BUTTON(
+        gtk_builder_get_object(builder, "varianteDelta"));
     w->rb_v3       = GTK_TOGGLE_BUTTON(
         gtk_builder_get_object(builder, "varianteMayorIgual"));
+        g_return_val_if_fail(GTK_IS_TOGGLE_BUTTON(w->rb_v3), 1);
     w->rb_v4       = GTK_TOGGLE_BUTTON(
         gtk_builder_get_object(builder, "varianteMIAcotado"));
 

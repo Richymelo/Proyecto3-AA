@@ -28,7 +28,7 @@
         <property name="margin-right">95</property>
         <property name="position">920</property>
         <child>
-          <object class="GtkBox">
+          <object class="GtkBox" id="box_solutions">
             <property name="visible">True</property>
             <property name="can-focus">False</property>
             <property name="orientation">vertical</property>
@@ -60,7 +60,7 @@
               </packing>
             </child>
             <child>
-              <object class="GtkScrolledWindow">
+              <object class="GtkScrolledWindow" id="results_scroll">
                 <property name="visible">True</property>
                 <property name="can-focus">True</property>
                 <property name="margin-left">20</property>
@@ -68,17 +68,26 @@
                 <property name="margin-bottom">20</property>
                 <property name="shadow-type">in</property>
                 <child>
-                  <object class="GtkViewport">
+                  <object class="GtkViewport" id="results_view">
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
                     <child>
                       <object class="GtkListBox" id="list_solutions">
                         <property name="visible">True</property>
                         <property name="can-focus">False</property>
+                        <style>
+                          <class name="white-bg"/>
+                        </style>
                       </object>
                     </child>
+                    <style>
+                      <class name="white-bg"/>
+                    </style>
                   </object>
                 </child>
+                <style>
+                  <class name="white-bg"/>
+                </style>
               </object>
               <packing>
                 <property name="expand">True</property>
@@ -232,7 +241,7 @@
                     <property name="can-focus">True</property>
                     <property name="receives-default">False</property>
                     <property name="margin-left">100</property>
-                    <property name="margin-right">30</property>
+                    <property name="margin-right">50</property>
                     <property name="active">True</property>
                     <property name="draw-indicator">True</property>
                   </object>
@@ -249,7 +258,7 @@
                     <property name="can-focus">True</property>
                     <property name="receives-default">False</property>
                     <property name="margin-left">100</property>
-                    <property name="margin-right">30</property>
+                    <property name="margin-right">50</property>
                     <property name="active">True</property>
                     <property name="draw-indicator">True</property>
                     <property name="group">varianteBasic</property>
@@ -267,7 +276,7 @@
                     <property name="can-focus">True</property>
                     <property name="receives-default">False</property>
                     <property name="margin-left">100</property>
-                    <property name="margin-right">30</property>
+                    <property name="margin-right">50</property>
                     <property name="active">True</property>
                     <property name="draw-indicator">True</property>
                     <property name="group">varianteBasic</property>
@@ -285,7 +294,7 @@
                     <property name="can-focus">True</property>
                     <property name="receives-default">False</property>
                     <property name="margin-left">100</property>
-                    <property name="margin-right">30</property>
+                    <property name="margin-right">50</property>
                     <property name="active">True</property>
                     <property name="draw-indicator">True</property>
                     <property name="group">varianteBasic</property>
