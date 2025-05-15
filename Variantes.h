@@ -1,31 +1,35 @@
+/*
+                Esta sección contiene las funciones de las 4 variantes
+                de backtracking para obtener subconjuntos. Las variantes
+                son: la básica, la delta, la mayor o igual y la mayor o
+                igual acotada. Se tiene además contadores de los nodos,
+                las soluciones y la suma de los ai que no sea han revisado
+                todavía.
+*/
 extern int nodos, soluciones;
 extern int delta;
 static int *suffix_sum;
 
 // ========================
-// VARIANTE 1: Basica
+// VARIANTE 1: Básica
 // ========================
-void
-sumaSubconjuntosV1_collect(int* A, int n, int W,
-                           int index,
-                           int* actual_idx,
-                           int tam_actual,
-                           int suma_actual,
-                           GPtrArray *sol_list)
-{
+void sumaSubconjuntosV1_collect(int* A, int n, int W, int index, int* actual_idx,
+                                int tam_actual, int suma_actual, GPtrArray *sol_list) {
+    // Contadores
     extern int nodos, soluciones;
     nodos++;
 
-    // 1) Poda si ya pasé W
+    // 1) Se poda si ya se pasó de W
     if (suma_actual > W)
         return;
 
-    // 2) Bounding: si ni con todo lo que queda llego a W
+    // 2) Se poda si ni con todo lo que queda llego a W
     if (suma_actual + suffix_sum[index] < W)
         return;
 
     // 3) Si llegué al final (hoja)
     if (index == n) {
+        // Si la suma es W, es solución
         if (suma_actual == W) {
             soluciones++;
             gboolean *mask = g_new0(gboolean, n);
@@ -36,7 +40,7 @@ sumaSubconjuntosV1_collect(int* A, int n, int W,
         return;
     }
 
-    // 4) Rama “incluir A[index]” — ¡solo si suma_actual + A[index] ≤ W!
+    // 4) Rama “incluir A[index]” — solo si suma_actual + A[index] ≤ W
     if (suma_actual + A[index] <= W) {
         actual_idx[tam_actual] = index;
         sumaSubconjuntosV1_collect(
@@ -60,28 +64,23 @@ sumaSubconjuntosV1_collect(int* A, int n, int W,
 // ========================
 // VARIANTE 2: Delta
 // ========================
-void
-sumaSubconjuntosV2_collect(int* A, int n, int W,
-    int index,
-    int* actual_idx,
-    int tam_actual,
-    int suma_actual,
-    GPtrArray *sol_list)
-{
+void sumaSubconjuntosV2_collect(int* A, int n, int W, int index, int* actual_idx,
+                                int tam_actual, int suma_actual, GPtrArray *sol_list) {
+    // Contadores
     extern int nodos, soluciones;
     nodos++;
-    // 0) Bounding superior: si ya pasé W+Δ ⇒ podo
+    // 0) Se poda si ya se pasó de W+Δ
     if (suma_actual > W + delta)
         return;
 
-    // 1) Bounding inferior: si ni con todo lo que queda llego a W-Δ ⇒ podo
+    // 1) Se poda si si ni con todo lo que queda se llega a W-Δ
     if (index < n &&
         suma_actual + suffix_sum[index] < W - delta)
     {
         return;
     }
 
-    // 2) Si la suma está ya en [W-Δ, W+Δ], registro y **corto** la rama
+    // 2) Si la suma está ya en [W-Δ, W+Δ], es solución
     if (suma_actual >= W - delta &&
         suma_actual <= W + delta)
     {
@@ -93,7 +92,7 @@ sumaSubconjuntosV2_collect(int* A, int n, int W,
         return;  // <<-- poda aquí para no explorar supersets
     }
 
-    // 3) Si llegué al final, no tengo nada más que hacer
+    // 3) Si se llegó al final, no hay nada más que hacer
     if (index == n)
         return;
 
@@ -119,21 +118,20 @@ sumaSubconjuntosV2_collect(int* A, int n, int W,
 // ========================
 // VARIANTE 3: Mayor o Igual
 // ========================
-void sumaSubconjuntosV3_collect(int* A, int n, int W,
-    int index, int* actual_idx,
-    int tam_actual, int suma_actual,
-    GPtrArray *sol_list)
-{
+void sumaSubconjuntosV3_collect(int* A, int n, int W, int index, int* actual_idx,
+                                int tam_actual, int suma_actual, GPtrArray *sol_list) {
+    // Contadores
     extern int nodos, soluciones;
     nodos++;
 
-    // 0) Bounding: si ni siquiera con todo lo que queda llego a W…
+    // 0) Se poda si ni siquiera con todo lo que queda se llega a W
     if (suma_actual + suffix_sum[index] < W) {
         return;
     }
 
-    // 1) Si llegué al final, estoy en una hoja
+    // 1) Se llegó al final
     if (index == n) {
+        // Si la suma es mayor o igual a W, es solución
         if (suma_actual >= W) {
             soluciones++;
             gboolean *mask = g_new0(gboolean, n);
@@ -163,19 +161,17 @@ void sumaSubconjuntosV3_collect(int* A, int n, int W,
 // ====================================
 // VARIANTE 4: Mayor o Igual Acotado
 // ====================================
-void sumaSubconjuntosV4_collect(int* A, int n, int W,
-    int index, int* actual_idx,
-    int tam_actual, int suma_actual,
-    GPtrArray *sol_list)
-{
+void sumaSubconjuntosV4_collect(int* A, int n, int W, int index, int* actual_idx,
+                                int tam_actual, int suma_actual, GPtrArray *sol_list) {
+    // Contadores
     extern int nodos, soluciones;
     nodos++;
 
-    // 0) Bounding: si ni sumando todo lo que queda llego a W, podo
+    // 0) Se poda si ni sumando todo lo que queda se llega a W
     if (suma_actual + suffix_sum[index] < W)
         return;
 
-    // 1) Si ya alcancé la meta, grabo y podo
+    // 1) Si la suma es mayor o igual a W, es solución
     if (suma_actual >= W) {
         soluciones++;
         gboolean *mask = g_new0(gboolean, n);
@@ -185,7 +181,7 @@ void sumaSubconjuntosV4_collect(int* A, int n, int W,
         return;
     }
 
-    // 2) Si procesé todos los elementos, paro
+    // 2) Si se llegó al final, no hay nada más que hacer
     if (index == n)
         return;
 
